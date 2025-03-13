@@ -2,8 +2,8 @@ from llama_index.core.agent import ReActAgent
 from llama_index.core import Settings
 from llama_index.llms.ollama import Ollama
 from llama_index.core.tools import FunctionTool
-from llama_index.vector_stores import SimpleVectorStore
-from llama_index.embeddings import OpenAIEmbedding
+from llama_index.core import VectorStoreIndex
+from llama_index.embeddings.openai import OpenAIEmbedding
 from dotenv import load_dotenv
 import os
 import pandas as pd
@@ -34,9 +34,17 @@ def transform_data(data):
 
 transformed_data = transform_data(df)
 
+
 # 3. 데이터 벡터화 및 인덱싱
-embedding_model = OpenAIEmbedding(api_key=os.getenv("OPENAI_API_KEY"))
-vector_store = SimpleVectorStore(embedding_model=embedding_model)
+embed_model = OpenAIEmbedding(
+    model="text-embedding-3-small",
+)
+
+embeddings = embed_model.get_text_embedding(
+    "Open AI new Embeddings models is awesome."
+)
+
+vector_store = VectorStoreIndex(embedding_model=embeddings)
 
 # 데이터 벡터화 및 인덱싱
 for index, row in transformed_data.iterrows():
