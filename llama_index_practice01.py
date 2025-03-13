@@ -2,7 +2,7 @@ from llama_index.core.agent import ReActAgent
 from llama_index.core import Settings
 from llama_index.llms.ollama import Ollama
 from llama_index.core.tools import FunctionTool
-from llama_index.vector_stores import VectorIndexStore
+from llama_index.vector_stores import SimpleVectorStore
 from llama_index.embeddings import OpenAIEmbedding
 from dotenv import load_dotenv
 import os
@@ -11,9 +11,18 @@ from sklearn.metrics import accuracy_score
 
 load_dotenv()
 
-# 1. Raw Data 로드
-# 예제: CSV 파일에서 데이터 로드
-data = pd.read_csv('data.csv')
+# 샘플 데이터 생성
+data = {
+    "column1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "column2": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "label": ["label1", "label2", "label3", "label4", "label5", "label6", "label7", "label8", "label9", "label10"]
+}
+
+# 데이터프레임 생성
+df = pd.DataFrame(data)
+
+# CSV 파일로 저장
+df.to_csv('data.csv', index=False)
 
 # 2. 데이터 변환
 # 예제: 데이터 정제 및 변환
@@ -23,11 +32,11 @@ def transform_data(data):
     # 데이터 변환 로직 추가
     return transformed_data
 
-transformed_data = transform_data(data)
+transformed_data = transform_data(df)
 
 # 3. 데이터 벡터화 및 인덱싱
 embedding_model = OpenAIEmbedding(api_key=os.getenv("OPENAI_API_KEY"))
-vector_store = VectorIndexStore(embedding_model=embedding_model)
+vector_store = SimpleVectorStore(embedding_model=embedding_model)
 
 # 데이터 벡터화 및 인덱싱
 for index, row in transformed_data.iterrows():
@@ -44,12 +53,8 @@ search_top_k_tool = FunctionTool.from_defaults(fn=search_top_k)
 # 5. initialize llm
 Settings.llm = Ollama(model="llama3.1", request_timeout="300")
 
-# 6. convert method to a tool
-f_multiply = FunctionTool.from_defaults(fn=multiply)
-f_add = FunctionTool.from_defaults(fn=add)
-
 # 7. call agent with the given tool
-agent = ReActAgent.from_tools([f_multiply, f_add, search_top_k_tool], verbose=True)
+agent = ReActAgent.from_tools([search_top_k_tool], verbose=True)
 
 # 8. 평가 함수 정의
 def evaluate_k_values(query, true_labels, k_values):
@@ -81,8 +86,7 @@ response = agent.chat(f"Search for the top {best_k} relevant documents for the q
 
 print(response)
 
-
-## 단계별 설명
+# 단계별 설명
 # Raw Data 로드: pandas 라이브러리를 사용하여 CSV 파일에서 데이터를 로드합니다.
 # 데이터 변환: transform_data 함수를 정의하여 데이터를 필요한 형식으로 변환합니다. 이 예제에서는 특정 열만 선택하고, 추가적인 변환 로직을 적용합니다.
 # 데이터 벡터화 및 인덱싱: OpenAIEmbedding 모델을 사용하여 데이터를 벡터화하고, VectorIndexStore를 사용하여 인덱싱합니다. 이를 통해 효율적으로 데이터를 검색할 수 있습니다.
