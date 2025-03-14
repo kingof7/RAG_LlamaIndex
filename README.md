@@ -15,6 +15,11 @@
 # python 가상환경 진입
 - .\ollama_tools\Scripts\python.exe activate
 
-# pip install 설치
+# 필수 pip install 설치
 - .\ollama_tools\Scripts\python.exe -m pip install --upgrade pip
-- .\ollama_tools\Scripts\pip.exe install llama_index llama-index-llms-ollama llama-index-embeddings-ollama llama-index-vector-stores-weaviate requests load_dotenv os requests_oauthlib scikit-learn
+- .\ollama_tools\Scripts\pip.exe install llama_index llama-index-llms-ollama llama-index-embeddings-ollama
+- .\ollama_tools\Scripts\pip.exe install llama-index-vector-stores-weaviate
+- .\ollama_tools\Scripts\pip.exe requests load_dotenv os requests_oauthlib scikit-learn
+
+# Gen AI Revolutionizes Text Analysis with OpenAI and Gemini 패키지
+- .\ollama_tools\Scripts\pip.exe install fastapi uvicorn llama_index llama-index-llms-openai llama-index-llms-gemini
