@@ -1,7 +1,9 @@
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, Settings
-from llama_index.llms.openai import OpenAI
+from llama_index.llms.ollama import Ollama
+# from llama_index.llms.openai import OpenAI
 
-Settings.llm = OpenAI(model="gpt-4o-mini")
+# Settings.llm = OpenAI(model="gpt-4o-mini")
+Settings.llm = Ollama(model="llama3.1", request_timeout="300")
 
 def query_over_text(query):
 

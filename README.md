@@ -17,4 +17,4 @@
 
 # pip install 설치
 - .\ollama_tools\Scripts\python.exe -m pip install --upgrade pip
-- .\ollama_tools\Scripts\pip.exe install llama_index llama-index-llms-ollama llama-index-vector-stores-weaviate requests load_dotenv os requests_oauthlib scikit-learn
+- .\ollama_tools\Scripts\pip.exe install llama_index llama-index-llms-ollama llama-index-embeddings-ollama llama-index-vector-stores-weaviate requests load_dotenv os requests_oauthlib scikit-learn

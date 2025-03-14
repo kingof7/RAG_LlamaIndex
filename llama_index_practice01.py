@@ -3,9 +3,8 @@ from llama_index.core import Settings
 from llama_index.llms.ollama import Ollama
 from llama_index.core.tools import FunctionTool
 from llama_index.core import VectorStoreIndex
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.embeddings.ollama import OllamaEmbedding
 from dotenv import load_dotenv
-import os
 import pandas as pd
 from sklearn.metrics import accuracy_score
 
@@ -34,25 +33,22 @@ def transform_data(data):
 
 transformed_data = transform_data(df)
 
-
 # 3. 데이터 벡터화 및 인덱싱
-embed_model = OpenAIEmbedding(
-    model="text-embedding-3-small",
+embed_model = OllamaEmbedding(
+    model_name="llama3",
+    base_url="http://localhost:11434",
+    ollama_additional_kwargs={"mirostat": 0}
 )
 
-embeddings = embed_model.get_text_embedding(
-    "Open AI new Embeddings models is awesome."
-)
-
-vector_store = VectorStoreIndex(embedding_model=embeddings)
+vector_index = VectorStoreIndex(embedding_model=embed_model)
 
 # 데이터 벡터화 및 인덱싱
 for index, row in transformed_data.iterrows():
-    vector_store.add_document(row.to_dict())
+    vector_index.add_document(row.to_dict())
 
 # 4. top_k 검색 함수 정의
 def search_top_k(query, k=5):
-    results = vector_store.search(query, top_k=k)
+    results = vector_index.search(query, top_k=k)
     return results
 
 # define a tool for the search_top_k function
@@ -60,6 +56,7 @@ search_top_k_tool = FunctionTool.from_defaults(fn=search_top_k)
 
 # 5. initialize llm
 Settings.llm = Ollama(model="llama3.1", request_timeout="300")
+
 
 # 7. call agent with the given tool
 agent = ReActAgent.from_tools([search_top_k_tool], verbose=True)
